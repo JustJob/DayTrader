@@ -98,6 +98,10 @@ if __name__ == '__main__':
 
     def checkTrades():
       ip = IntervalPrices(interval, coinStr)
+      while len(ip.origtimeline.keys()) == 0:
+        ip = IntervalPrices(interval, coinStr)
+        time.sleep(100)
+
       ip.setParams(emaPair[0], emaPair[1])
       return tradeIfShould(ip)
 

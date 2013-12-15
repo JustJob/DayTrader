@@ -21,22 +21,26 @@ class IntervalPrices:
       'step':interval
     }
 
-    response = requests.get("http://s2.bitcoinwisdom.com:8080/period", params = params, headers={'Cache-Control': 'max-age=0', 'Pragma':'no-cache', 'User-Agent':'Mozilla/5.0'})
-    IntervalPrices.NONCE += 1
-    if response.status_code == 200:
-      responseJson = response.json()
-      for line in responseJson:
-        ts = int(line[0])
-        self.origtimeline[ts] = {
-          'open':float(line[3]),
-          'close':float(line[4]),
-          'low':float(line[5]),
-          'high':float(line[6])
-        }
-    else:
-      print "can't get response"
+    try:
+      response = requests.get("http://s2.bitcoinwisdom.com:8080/period", params = params, headers={'Cache-Control': 'max-age=0', 'Pragma':'no-cache', 'User-Agent':'Mozilla/5.0'})
+      IntervalPrices.NONCE += 1
+      if response.status_code == 200:
+        responseJson = response.json()
+        for line in responseJson:
+          ts = int(line[0])
+          self.origtimeline[ts] = {
+            'open':float(line[3]),
+            'close':float(line[4]),
+            'low':float(line[5]),
+            'high':float(line[6])
+          }
+      else:
+        print "can't get response"
 
-    response.close()
+      response.close()
+    except Exception as e:
+      print "Can't get interval prices"
+      print e
 
   def setParams(self, firstEMA = 10, secondEMA = 21):
     self.timeline = copy.deepcopy(self.origtimeline)

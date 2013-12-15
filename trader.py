@@ -27,18 +27,24 @@ class Trader:
            "Key":self.BTC_api_key,
            "Sign":sign}
 
-  def __getResponse(self, params, headers):
-    response = requests.post("https://btc-e.com/tapi", data=params, headers=headers)
-    if response.status_code != 200:
-      print 'BAD request'
-      print response.status_code
-    else:
-      response = response.json()
-      if response['success'] != 1:
-        print 'unsuccessful',params
-        print response
-      else:
-        return response['return']
+  def __getResponse(self, params, headers, retries = 3):
+    for x in xrange(retries):
+      try:
+        response = requests.post("https://btc-e.com/tapi", data=params, headers=headers)
+        if response.status_code != 200:
+          print 'BAD request'
+          print response.status_code
+        else:
+          response = response.json()
+          if response['success'] != 1:
+            print 'unsuccessful',params
+            print response
+            return None
+          else:
+            return response['return']
+      except Exception as e:
+        print "Bad request to trader"
+        print e
 
   def __updateNonce(self):
     self.nonce += 1
